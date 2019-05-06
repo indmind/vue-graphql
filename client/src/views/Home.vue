@@ -1,21 +1,32 @@
 <template>
   <div class="home">
-    <input type="number" v-model="id">
+    <input type="number" v-model="id" />
 
     <!-- <div class="container">
       <Card v-if="customer" :title="customer.name" text="aset" />
     </div> -->
 
-
     <div class="layout">
       <div class="left">
-        <Card v-if="customer" :title="customer.nama" :key="customer.no" id="customer-detail" class="slide-in-blurred-left"/>
+        <Card
+          v-if="customer"
+          :title="customer.nama"
+          :key="customer.no"
+          id="customer-detail"
+          class="slide-in-blurred-left"
+        />
       </div>
 
       <div class="right">
         <div class="customers-container">
           <div class="grid">
-            <Card class="card" v-for="customer in customers" :title="customer.nama.split(' ').shift()" :key="customer.no" @click.native="setCustomer(customer)"/>
+            <Card
+              class="card"
+              v-for="customer in customers"
+              :title="customer.nama.split(' ').shift()"
+              :key="customer.no"
+              @click.native="setCustomer(customer)"
+            />
           </div>
         </div>
       </div>
@@ -24,7 +35,7 @@
 </template>
 
 <script>
-import Card from "@/components/Card.vue"
+import Card from "@/components/Card.vue";
 
 import { CustomerServices } from "@/services.js";
 
@@ -37,26 +48,34 @@ export default {
     return {
       id: 1,
       customer: null,
-      customers: []
-    }
+      customers: [],
+      cs: null
+    };
   },
   async created() {
-      this.customers = await CustomerServices.getCustomers();
+    this.cs = new CustomerServices();
+
+    await this.cs.setup();
+
+    this.customers = await this.cs.getCustomers();
   },
   watch: {
     async id(val) {
-      console.log("changed")
-      this.customer = await CustomerServices.getCustomer(val);
+      this.customer = await this.cs.getCustomer(val);
     }
   },
   methods: {
     setCustomer(customer) {
-      const detailElement = document.getElementById("customer-detail")
-      if(detailElement) detailElement.className = "slide-out-blurred-left";
+      const detailElement = document.getElementById("customer-detail");
 
-      setTimeout(() => {
-        this.customer = customer;
-      }, detailElement ? 300 : 0); 
+      if (detailElement) detailElement.className = "slide-out-blurred-left";
+
+      setTimeout(
+        () => {
+          this.customer = customer;
+        },
+        detailElement ? 300 : 0
+      );
     }
   }
 };
@@ -64,7 +83,7 @@ export default {
 
 <style lang="scss">
 .container {
-   display: flex;
+  display: flex;
   justify-content: center;
   align-items: center;
   height: 50vh;
@@ -93,15 +112,15 @@ export default {
     left: 0px;
     width: 50%;
     min-height: 600px;
-    
+
     div {
-      margin: 60px 20px ;
+      margin: 60px 20px;
       padding: 5px 0;
       display: inline-block;
       min-height: 600px;
       width: 100%;
       height: 100%;
-  
+
       div {
         background-color: white;
         width: 80%;
@@ -131,35 +150,34 @@ export default {
   padding: 5px 0;
 }
 
-
 .slide-in-blurred-left {
-	-webkit-animation: slide-in-blurred-left 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
-	        animation: slide-in-blurred-left 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+  -webkit-animation: slide-in-blurred-left 0.5s cubic-bezier(0.23, 1, 0.32, 1)
+    both;
+  animation: slide-in-blurred-left 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
 .slide-out-blurred-left {
-	-webkit-animation: slide-out-blurred-left 0.3s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
-	        animation: slide-out-blurred-left 0.3s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
+  -webkit-animation: slide-out-blurred-left 0.3s cubic-bezier(0.23, 1, 0.32, 1)
+    both;
+  animation: slide-out-blurred-left 0.3s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-
 
 @-webkit-keyframes slide-in-blurred-left {
   0% {
     -webkit-transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
-            transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
+    transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
     -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    
-           
+    transform-origin: 0% 50%;
+
     opacity: 0;
   }
   100% {
     -webkit-transform: translateX(0) scaleY(1) scaleX(1);
-            transform: translateX(0) scaleY(1) scaleX(1);
+    transform: translateX(0) scaleY(1) scaleX(1);
     -webkit-transform-origin: 50% 50%;
-            transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
     -webkit-filter: blur(0);
-            filter: blur(0);
+    filter: blur(0);
     opacity: 1;
   }
 }
@@ -167,20 +185,19 @@ export default {
 @keyframes slide-in-blurred-left {
   0% {
     -webkit-transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
-            transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
+    transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
     -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    
-           
+    transform-origin: 0% 50%;
+
     opacity: 0;
   }
   100% {
     -webkit-transform: translateX(0) scaleY(1) scaleX(1);
-            transform: translateX(0) scaleY(1) scaleX(1);
+    transform: translateX(0) scaleY(1) scaleX(1);
     -webkit-transform-origin: 50% 50%;
-            transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
     -webkit-filter: blur(0);
-            filter: blur(0);
+    filter: blur(0);
     opacity: 1;
   }
 }
@@ -188,20 +205,19 @@ export default {
 @-webkit-keyframes slide-out-blurred-left {
   0% {
     -webkit-transform: translateX(0) scaleY(1) scaleX(1);
-            transform: translateX(0) scaleY(1) scaleX(1);
+    transform: translateX(0) scaleY(1) scaleX(1);
     -webkit-transform-origin: 50% 50%;
-            transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
     -webkit-filter: blur(0);
-            filter: blur(0);
+    filter: blur(0);
     opacity: 1;
   }
   100% {
     -webkit-transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
-            transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
+    transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
     -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    
-           
+    transform-origin: 0% 50%;
+
     opacity: 0;
   }
 }
@@ -209,23 +225,20 @@ export default {
 @keyframes slide-out-blurred-left {
   0% {
     -webkit-transform: translateX(0) scaleY(1) scaleX(1);
-            transform: translateX(0) scaleY(1) scaleX(1);
+    transform: translateX(0) scaleY(1) scaleX(1);
     -webkit-transform-origin: 50% 50%;
-            transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
     -webkit-filter: blur(0);
-            filter: blur(0);
+    filter: blur(0);
     opacity: 1;
   }
   100% {
     -webkit-transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
-            transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
+    transform: translateX(-1200px) scaleX(2.5) scaleY(0.2);
     -webkit-transform-origin: 0% 50%;
-            transform-origin: 0% 50%;
-    
-           
+    transform-origin: 0% 50%;
+
     opacity: 0;
   }
 }
-
 </style>
-

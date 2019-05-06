@@ -1,12 +1,37 @@
 import "cross-fetch/polyfill";
 import ApolloClient, { gql } from "apollo-boost";
 
-const client = new ApolloClient({
-  uri: "http://localhost:4000/graphql"
-});
+const ec2 = require("ec2-publicip");
 
-export class CustomerServices {
-  static async getCustomer(id = 1) {
+function getIp() {
+  return new Promise(resolve => {
+    ec2.getPublicIP((error, ip) => {
+      if (error) {
+        return resolve("localhost");
+      }
+      resolve(ip);
+    });
+  });
+}
+
+class Client {
+  apollo;
+
+  async setup() {
+    this.apollo = new ApolloClient({
+      uri: `http://${await getIp()}:4000/graphql`
+    });
+  }
+
+  async query(...params) {
+    const { data } = await this.apollo.query(...params);
+
+    return await data;
+  }
+}
+
+export class CustomerServices extends Client {
+  async getCustomer(id = 1) {
     const query = gql`
       {
         customer(no: ${id || 1}) {
@@ -17,11 +42,10 @@ export class CustomerServices {
       }
     `;
 
-    const data = await client.query({ query });
-    return (await data.data).customer;
+    return (await super.query({ query })).customer;
   }
 
-  static async getCustomers() {
+  async getCustomers() {
     const query = gql`
       {
         customers {
@@ -31,7 +55,6 @@ export class CustomerServices {
       }
     `;
 
-    const data = await client.query({ query });
-    return (await data.data).customers;
+    return (await super.query({ query })).customers;
   }
 }
